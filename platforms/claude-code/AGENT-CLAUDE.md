@@ -1,15 +1,10 @@
-# Session Start — Skills Bootstrap Check
+# Session Start
 > **Kit directory:** `[KIT_DIR]` refers to the directory containing this file. Resolve it from the path used to load this file.
 
-Use `Glob` to check for `.claude/commands/pb/*.md`. Do this silently — no output on success.
-
-* **Skills present** → proceed normally with this file as the instruction set.
-* **Skills missing** → read `[KIT_DIR]/project/OWNER.md` to resolve the OWNER's name, then inform them: "Claude Code skills are not set up. Run `[KIT_DIR]/platforms/claude-code/bootstrap.sh` to enable them (`/pb:init`, `/pb:tdd`, `/pb:dev`, etc.). Install now? (y/n)"
-  * **y** → run `bash [KIT_DIR]/platforms/claude-code/bootstrap.sh`, then proceed normally.
-  * **n** → read `[KIT_DIR]/AGENT.md` and follow it as the primary instruction set for this session.
+Read `[KIT_DIR]/project/OWNER.md` silently to resolve the OWNER's name.
 
 # Modes
-Switch via available skills — see `.claude/commands/pb/` for what's installed.
+Switch by asking naturally (e.g. "switch to TDD mode", "let's do a review").
 Default: CHAT (💬) — explore and discuss, no code changes.
 
 # Multi-Agent Delegation

@@ -5,7 +5,7 @@
 
 # Session Start
 1. Check if `[KIT_DIR]/project/OWNER.md` exists.
-   - If missing: reply `✨ Project not initialised. Run \`/pb:init\` to set up this project.` and stop.
+   - If missing: reply `✨ Project not initialised. Would you like to initialise it now? (y/n)`. If user replies y, read `[KIT_DIR]/INIT.md` and follow its instructions. If n, stop.
 2. Read `[KIT_DIR]/project/OWNER.md` → resolve OWNER name.
 3. Read `[KIT_DIR]/project/MODES.md` → resolve default mode.
 4. Reply: `✨[MODE emoji] Hello [OWNER]! You are currently in [MODE] mode.`

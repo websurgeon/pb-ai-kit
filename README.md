@@ -29,7 +29,7 @@ read .ai/INIT.md and follow it
 
 > Replace `.ai` with your chosen directory name if different.
 
-The setup will run automatically and ask you the following questions:
+The setup will ask you the following questions:
 
 | Question | Why |
 |----------|-----|
@@ -40,7 +40,7 @@ The setup will run automatically and ask you the following questions:
 
 ### 3. Restart the session
 
-After setup completes, restart your Claude Code session. From that point on, every session starts automatically — no prompting required.
+After setup completes, restart your Claude Code session. From that point on, every session starts automatically — no prompting required. Switch modes by asking naturally.
 
 ---
 
@@ -53,7 +53,7 @@ The kit gives your AI assistant:
 - **Project context** — per-project configuration (owner, tech stack, conventions)
 - **Shared standards** — code principles, commit rules, and test conventions
 - **Specialist agents** — named sub-agents for analysis, testing, implementation, review, and commits
-- **Platform-specific setup** — bootstrap scripts and skill definitions for Claude Code; sub-agent patterns for Gemini
+- **Platform-specific setup** — Claude Code entry point and sub-agent patterns; sub-agent patterns for Gemini
 
 The kit is designed so that AI reads the right files automatically at session start, with no manual prompting required after setup.
 
@@ -82,9 +82,7 @@ The kit is designed so that AI reads the right files automatically at session st
 ├── platforms/
 │   ├── claude-code/
 │   │   ├── AGENT-CLAUDE.md         # Claude Code-specific session start
-│   │   ├── bootstrap.sh            # Installs Claude Code skills (/pb:tdd, etc.)
-│   │   ├── SUBAGENT_PATTERNS.md    # How to spawn sub-agents in Claude Code
-│   │   └── commands/               # Skill definitions (one .md per skill)
+│   │   └── SUBAGENT_PATTERNS.md    # How to spawn sub-agents in Claude Code
 │   └── gemini/
 │       └── SUBAGENT_PATTERNS.md    # How to spawn sub-agents in Gemini CLI
 │
@@ -112,13 +110,13 @@ The kit is designed so that AI reads the right files automatically at session st
 
 | Platform | Config File | Notes |
 |----------|-------------|-------|
-| **Claude Code** | `CLAUDE.md` → `[KIT_DIR]/platforms/claude-code/AGENT-CLAUDE.md` | Full skills support via bootstrap |
+| **Claude Code** | `CLAUDE.md` → `[KIT_DIR]/platforms/claude-code/AGENT-CLAUDE.md` | Sub-agent delegation support |
 | **Gemini CLI** | `GEMINI.md` → `[KIT_DIR]/AGENT.md` | Sub-agent patterns available |
 | **Cursor** | `[KIT_DIR]/AGENT.md` | Direct read; no platform-specific setup yet |
 | **GitHub Copilot** | `[KIT_DIR]/AGENT.md` | Direct read; no platform-specific setup yet |
 | **ChatGPT / GPT-4** | `[KIT_DIR]/AGENT.md` | Direct read; no platform-specific setup yet |
 
-Claude Code gets its own entry point (`AGENT-CLAUDE.md`) because it supports platform-specific features — skills bootstrapping, slash commands, and sub-agent invocation — that don't apply to other platforms.
+Claude Code gets its own entry point (`AGENT-CLAUDE.md`) because it supports sub-agent delegation patterns that don't apply to other platforms.
 
 ---
 
@@ -133,33 +131,13 @@ The AI operates in one of four modes. Each has a distinct persona and workflow:
 | **TDD** | 🔴 | Test-driven: RED → GREEN → REFACTOR cycle |
 | **REVIEW** | 🔍 | Code review, audit, and finding verification |
 
-Default mode is **CHAT**. Switch modes by asking naturally or using a `/pb:` skill.
-
----
-
-## Claude Code Skills
-
-The following skills are installed by the bootstrap (run automatically during setup). You never need to call them directly — the AI invokes the right one based on what you ask. They are listed here for reference.
-
-| Skill | What to say |
-|-------|-------------|
-| `/pb:init` | "Re-initialise the project config" |
-| `/pb:chat` | "Switch to chat mode" / "Let's just discuss this" |
-| `/pb:dev` | "Switch to dev mode" / "Implement this directly" |
-| `/pb:tdd` | "Switch to TDD mode" / "Let's do this test-first" |
-| `/pb:review` | "Review this" / "Switch to review mode" |
-| `/pb:plan` | "Plan ticket MDT-1234" / "Break this ticket into steps" |
-| `/pb:analyse` | "Analyse AuthService.ts" / "Explore this before we start" |
-| `/pb:commit` | "Commit these changes" / "Let's commit, JIRA is MDT-1234" |
-| `/pb:refactor` | "Refactor this file" / "Clean this up without changing behaviour" |
-| `/pb:audit` | "Run a full review audit" / "Audit the changes on this branch" |
-| `/pb:wip` | "Set the done criteria for this ticket" |
+Default mode is **CHAT**. Switch modes by asking naturally (e.g. "switch to TDD mode", "let's do a review").
 
 ---
 
 ## Gemini CLI & Other Platforms
 
-No bootstrap step is required for non-Claude-Code platforms. Point the AI at the appropriate entry file and use natural-language prompts.
+Point the AI at the appropriate entry file and use natural-language prompts.
 
 | Platform | Entry File |
 |----------|------------|

@@ -18,14 +18,7 @@ Check if `CLAUDE.md` exists at the project root.
 
 ---
 
-## Step 2 — Bootstrap
-
-Check if `.claude/commands/pb/` contains any `.md` files.
-- If missing or empty: run `bash [KIT_DIR]/platforms/claude-code/bootstrap.sh`.
-
----
-
-## Step 3 — Project config
+## Step 2 — Project config
 
 Detect the framework by inspecting the project root for these indicators (check in order):
 
@@ -68,7 +61,7 @@ Read [KIT_DIR]/AGENT.md and follow it as your primary instruction set.
 
 ---
 
-## Step 4 — Done
+## Step 3 — Done
 
 Reply:
 ```
@@ -85,7 +78,7 @@ Reply:
   - [KIT_DIR]/project/scripts.env
   - [KIT_DIR]/project/PROJECT_SPECIFIC_DETAILS.md
 
-Please restart the session to activate /pb:* commands.
+Please restart the session.
 
 Next steps after restart:
 - Fill in the architecture details in `[KIT_DIR]/project/PROJECT_SPECIFIC_DETAILS.md`
