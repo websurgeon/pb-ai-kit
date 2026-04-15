@@ -6,19 +6,33 @@ This file is Claude Code-specific. Other platforms should ignore it.
 
 Use the `Agent` tool to spawn sub-agents. Each invocation is stateless — it starts with no memory of the main conversation.
 
+## Compute Tier → Model Mapping
+
+| Tier | Model | Use When |
+|------|-------|----------|
+| `economy` | `haiku` | Mechanical tasks — formatting, fact-checking, git commands |
+| `standard` | `sonnet` | Default — reasoning, writing, analysis |
+| `performance` | `opus` | Deep reasoning — architecture, cross-cutting trade-offs |
+
+The orchestrator MUST pass the `model` parameter when spawning any sub-agent. Use the specialist's default tier from `DELEGATES.md`. Override when the specific task is clearly simpler or more complex than the default.
+
 ## Specialist → Agent Type Mapping
 
-| Specialist | subagent_type | Notes |
-|------------|---------------|-------|
-| SPEC_ANALYST | `Explore` | Optimized for codebase exploration and file reading |
-| SPEC_ARCHITECT | `general-purpose` | Needs reasoning and file reads |
-| SPEC_TEST_WRITER | `general-purpose` | Writes files |
-| SPEC_IMPLEMENTER | `general-purpose` | Writes files |
-| SPEC_REFACTOR | `general-purpose` | Writes files |
-| SPEC_COMMIT | `general-purpose` | Runs bash and git commands |
-| SPEC_REVIEWER | `Explore` | Read-only diff analysis — use `Bash` tool for all git diff commands, not `Grep` or `Read` |
-| SPEC_FINDING_VERIFIER | `general-purpose` | Batched verification of all findings in one invocation |
-| **Audit Coordinator** | `general-purpose` | Runs entire REVIEW Phase 2 — spawns its own reviewer/verifier sub-agents |
+| Specialist | subagent_type | model | Notes |
+|------------|---------------|-------|-------|
+| SPEC_ANALYST | `Explore` | `sonnet` | Optimized for codebase exploration and file reading |
+| SPEC_ARCHITECT | `general-purpose` | `opus` | Needs deep reasoning and file reads |
+| SPEC_TEST_WRITER | `general-purpose` | `sonnet` | Writes files |
+| SPEC_IMPLEMENTER | `general-purpose` | `sonnet` | Writes files |
+| SPEC_REFACTOR | `general-purpose` | `sonnet` | Writes files |
+| SPEC_COMMIT | `general-purpose` | `haiku` | Runs bash and git commands |
+| SPEC_REVIEWER | `Explore` | `sonnet` | Read-only diff analysis — use `Bash` tool for all git diff commands, not `Grep` or `Read` |
+| SPEC_FINDING_VERIFIER | `general-purpose` | `haiku` | Batched verification of all findings in one invocation |
+| **Audit Coordinator** | `general-purpose` | `sonnet` | Runs entire REVIEW Phase 2 — spawns its own reviewer/verifier sub-agents |
+
+### Override Examples
+- ANALYST exploring a single well-scoped file → downgrade to `haiku`
+- IMPLEMENTER writing cross-cutting middleware touching many layers → upgrade to `opus`
 
 ## Prompt Construction
 

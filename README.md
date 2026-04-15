@@ -184,13 +184,25 @@ These prompts work on any platform:
 
 Named specialist agents used internally during DEV, TDD, and REVIEW modes — also invocable explicitly.
 
-| Specialist | File | Role |
-|------------|------|------|
-| `SPEC_ANALYST` | `agents/specialists/SPEC_ANALYST.md` | Explore code, return structured summary |
-| `SPEC_ARCHITECT` | `agents/specialists/SPEC_ARCHITECT.md` | Design and architectural reasoning |
-| `SPEC_TEST_WRITER` | `agents/specialists/SPEC_TEST_WRITER.md` | Write failing tests (RED phase) |
-| `SPEC_IMPLEMENTER` | `agents/specialists/SPEC_IMPLEMENTER.md` | Write production code (GREEN phase) |
-| `SPEC_REFACTOR` | `agents/specialists/SPEC_REFACTOR.md` | Clean code without behaviour changes |
-| `SPEC_REVIEWER` | `agents/specialists/SPEC_REVIEWER.md` | Diff analysis and finding generation |
-| `SPEC_FINDING_VERIFIER` | `agents/specialists/SPEC_FINDING_VERIFIER.md` | Verify review findings against the code |
-| `SPEC_COMMIT` | `agents/specialists/SPEC_COMMIT.md` | Prepare commit message and await approval |
+Each specialist has a **compute tier** — a platform-agnostic label for how much capability the task warrants. Platform-specific files translate tiers to actual models (e.g. Claude Code maps them to `haiku | sonnet | opus`). See `platforms/<platform>/SUBAGENT_PATTERNS.md`.
+
+| Specialist | File | Role | Tier |
+|------------|------|------|------|
+| `SPEC_ANALYST` | `agents/specialists/SPEC_ANALYST.md` | Explore code, return structured summary | `standard` |
+| `SPEC_ARCHITECT` | `agents/specialists/SPEC_ARCHITECT.md` | Design and architectural reasoning | `performance` |
+| `SPEC_TEST_WRITER` | `agents/specialists/SPEC_TEST_WRITER.md` | Write failing tests (RED phase) | `standard` |
+| `SPEC_IMPLEMENTER` | `agents/specialists/SPEC_IMPLEMENTER.md` | Write production code (GREEN phase) | `standard` |
+| `SPEC_REFACTOR` | `agents/specialists/SPEC_REFACTOR.md` | Clean code without behaviour changes | `standard` |
+| `SPEC_REVIEWER` | `agents/specialists/SPEC_REVIEWER.md` | Diff analysis and finding generation | `standard` |
+| `SPEC_FINDING_VERIFIER` | `agents/specialists/SPEC_FINDING_VERIFIER.md` | Verify review findings against the code | `economy` |
+| `SPEC_COMMIT` | `agents/specialists/SPEC_COMMIT.md` | Prepare commit message and await approval | `economy` |
+
+### Compute Tiers
+
+| Tier | Intent | Claude Code model |
+|------|--------|------------------|
+| `economy` | Mechanical — formatting, fact-checking, git commands | `haiku` |
+| `standard` | Default — reasoning, writing, analysis | `sonnet` |
+| `performance` | Deep reasoning — architecture, cross-cutting trade-offs | `opus` |
+
+Tiers are defaults. The orchestrator may override for a specific task when it is clearly simpler or more complex than the default. Adding a new platform's model mapping requires only a new `platforms/<platform>/SUBAGENT_PATTERNS.md` — `DELEGATES.md` and specialist files stay unchanged.
