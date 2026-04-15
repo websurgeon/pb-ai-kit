@@ -6,20 +6,36 @@ This file is Gemini CLI-specific. Other platforms should ignore it.
 
 Use the `codebase_investigator` and `generalist` sub-agents to delegate tasks. Each invocation is stateless — it starts with no memory of the main conversation.
 
+## Compute Tier → Model Mapping
+
+| Tier | Gemini Model | Use When |
+|------|--------------|----------|
+| `economy` | `Flash` (e.g., `gemini-3-flash-preview`) | Mechanical tasks — formatting, fact-checking, git commands |
+| `standard` | `Pro` (e.g., `gemini-3-pro-preview`) | Default — reasoning, writing, analysis |
+| `performance` | `Pro` (e.g., `gemini-3-pro-preview`) | Deep reasoning — architecture, cross-cutting trade-offs |
+
+## Model Routing Mechanisms
+
+Gemini CLI handles model selection through three primary methods:
+
+1. **Automatic Complexity-Based Routing:** When configured to use an **"Auto"** model (e.g., `Auto (Gemini 3)`), the CLI automatically selects between **Pro** (high-reasoning) and **Flash** (high-speed) models based on the task complexity.
+2. **Phase-Based Routing:** In **Plan Mode**, the CLI automatically routes requests to a **Pro** model during the Planning Phase and switches to a **Flash** model for the Implementation Phase.
+3. **Manual Configuration:** Subagent models can be explicitly overridden in the `settings.json` file or via interactive commands (`/agents config <agent-name>`).
+
 ## Specialist → Agent Type Mapping
 
-| Specialist | subagent_tool | Notes |
-|------------|---------------|-------|
-| SPEC_ANALYST | `codebase_investigator` | Optimized for exploration, analysis, and architectural mapping |
-| SPEC_ARCHITECT | `codebase_investigator` | Best for understanding patterns and cross-cutting concerns |
-| SPEC_TEST_WRITER | `generalist` | Writes files and handles specific implementation tasks |
-| SPEC_IMPLEMENTER | `generalist` | Writes files and handles specific implementation tasks |
-| SPEC_REFACTOR | `generalist` | Performs refactoring and file modifications |
-| SPEC_COMMIT | `generalist` | Runs shell commands and prepares git operations |
+| Specialist | subagent_tool | Default Tier | Notes |
+|------------|---------------|--------------|-------|
+| SPEC_ANALYST | `codebase_investigator` | `standard` | Optimized for exploration and analysis |
+| SPEC_ARCHITECT | `codebase_investigator` | `performance` | Best for understanding patterns and architecture |
+| SPEC_TEST_WRITER | `generalist` | `standard` | Writes files and handles implementation |
+| SPEC_IMPLEMENTER | `generalist` | `standard` | Writes files and handles implementation |
+| SPEC_REFACTOR | `generalist` | `standard` | Performs refactoring and modifications |
+| SPEC_COMMIT | `generalist` | `economy` | Runs shell commands and git operations |
 
 ## Prompt Construction
 
-Each sub-agent prompt should be constructed with three clear sections:
+Each sub-agent prompt should follow this structure:
 
 ```
 [1. ROLE — paste the relevant SPEC_*.md file content]
@@ -28,72 +44,14 @@ Each sub-agent prompt should be constructed with three clear sections:
 ```
 
 ### Context Budget Rule
-Keep injected context focused to maintain speed and accuracy:
 * **Paths over Content:** Pass file paths and symbols, not full file contents where possible.
 * **Summaries over Raw Data:** Pass structured summaries from previous specialists.
-* **Selective Principles:** Only inject `CODE_PRINCIPLES.md` or `TEST_CONVENTIONS.md` when the specialist is responsible for writing or refactoring code.
+* **Selective Principles:** Only inject `CODE_PRINCIPLES.md` or `TEST_CONVENTIONS.md` when the specialist is writing code.
 
 ## Parallel Execution
 
-Run specialists in parallel when their inputs are fully independent — neither result feeds the other.
-
-**Safe to parallelise:**
-- Multiple `codebase_investigator` calls exploring unrelated modules
-- `codebase_investigator` (ANALYST) + `codebase_investigator` (ARCHITECT) when the architect has sufficient context without the analyst's result
-- Multiple `generalist` calls for changes in separate, unrelated files
-
-**Not safe to parallelise:**
-- ANALYST → TEST_WRITER (writer needs the analyst's summary)
-- TEST_WRITER → IMPLEMENTER (implementer needs the failing test)
-- Any chain where specialist N+1 consumes specialist N's output
+Gemini CLI executes independent tool calls in parallel by default. Run specialists in parallel when their inputs are independent (e.g., multiple `codebase_investigator` calls exploring unrelated modules).
 
 **Decision rule:**
 > Can I write the full prompt for both specialists right now, without waiting for either result?
 > If yes → parallel. If no → sequential.
-
-Note: Gemini CLI executes multiple independent tool calls in parallel automatically when possible.
-
-## Example: Spawning ANALYST (codebase_investigator)
-
-```
-codebase_investigator tool:
-  objective: |
-    [paste SPEC_ANALYST.md content]
-
-    CONTEXT:
-    The orchestrator needs to understand the existing auth service before writing a new test.
-
-    TASK:
-    Explore the auth feature at `app/src/features/auth/`. Return:
-    - Domain interfaces
-    - Existing test patterns
-    - DI registration location
-```
-
-## Example: Spawning TEST_WRITER (generalist)
-
-```
-generalist tool:
-  request: |
-    [paste SPEC_TEST_WRITER.md content]
-
-    [paste TEST_CONVENTIONS.md content]
-
-    CONTEXT (from ANALYST summary):
-    - AuthService interface: `app/src/features/auth/domain/AuthService.ts`
-    - Existing tests pattern: `__tests__/AuthService.test.tsx`
-    - Mock helper pattern: `makeAuthService()` returns `jest.Mocked<AuthService>`
-
-    TASK:
-    Write a failing test for the `login(email, password)` method.
-    Scenario: returns a user when credentials are valid.
-```
-
-## Returning Results to Main Context
-
-To keep the orchestrator context lean, specialists should return only essential information:
-* **ANALYST / ARCHITECT:** Return the structured summary/insight block defined in their SPEC file.
-* **TEST_WRITER / IMPLEMENTER / REFACTOR:** Confirm the file path(s) modified and provide a one-line description of the change.
-* **COMMIT:** Return the full commit preparation block for OWNER approval.
-
-Avoid pasting raw file contents back into the main orchestrator loop unless explicitly requested by the OWNER.

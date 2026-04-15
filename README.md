@@ -144,6 +144,25 @@ Point the AI at the appropriate entry file and use natural-language prompts.
 | **Gemini CLI** | `GEMINI.md` at repo root (created during setup if requested) |
 | **All others** | `[KIT_DIR]/AGENT.md` directly |
 
+### Gemini CLI Configuration
+
+To optimize sub-agent performance, you can configure model overrides in your `~/.gemini/settings.json`. This ensures that specialists like the `codebase_investigator` (Analyst/Architect) and `generalist` (Implementer/Test Writer) use the appropriate compute tiers.
+
+```json
+{
+  "agents": {
+    "overrides": {
+      "codebase_investigator": {
+        "modelConfig": { "model": "gemini-3-pro-preview" }
+      },
+      "generalist": {
+        "modelConfig": { "model": "gemini-3-flash-preview" }
+      }
+    }
+  }
+}
+```
+
 Gemini has additional kit support: sub-agent delegation patterns are defined in `[KIT_DIR]/platforms/gemini/SUBAGENT_PATTERNS.md`. For complex multi-step tasks, instruct Gemini to read that file.
 
 ---
@@ -199,10 +218,10 @@ Each specialist has a **compute tier** — a platform-agnostic label for how muc
 
 ### Compute Tiers
 
-| Tier | Intent | Claude Code model |
-|------|--------|------------------|
-| `economy` | Mechanical — formatting, fact-checking, git commands | `haiku` |
-| `standard` | Default — reasoning, writing, analysis | `sonnet` |
-| `performance` | Deep reasoning — architecture, cross-cutting trade-offs | `opus` |
+| Tier | Intent | Claude Code model | Gemini CLI model |
+|------|--------|------------------|------------------|
+| `economy` | Mechanical — formatting, fact-checking, git commands | `haiku` | `Flash` |
+| `standard` | Default — reasoning, writing, analysis | `sonnet` | `Pro` / `Auto` |
+| `performance` | Deep reasoning — architecture, cross-cutting trade-offs | `opus` | `Pro` |
 
 Tiers are defaults. The orchestrator may override for a specific task when it is clearly simpler or more complex than the default. Adding a new platform's model mapping requires only a new `platforms/<platform>/SUBAGENT_PATTERNS.md` — `DELEGATES.md` and specialist files stay unchanged.

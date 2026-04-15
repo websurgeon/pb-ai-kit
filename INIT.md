@@ -82,5 +82,6 @@ Please restart the session.
 
 Next steps after restart:
 - Fill in the architecture details in `[KIT_DIR]/project/PROJECT_SPECIFIC_DETAILS.md`
+[If GEMINI.md was created]: - (Optional) Configure sub-agent model overrides in `~/.gemini/settings.json` for optimal performance. See `[KIT_DIR]/README.md` for an example.
 [If unsupported framework]: - Add test conventions in `[KIT_DIR]/frameworks/[framework]/` — see existing frameworks for the expected structure
 ```

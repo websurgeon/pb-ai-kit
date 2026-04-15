@@ -33,7 +33,7 @@ Platform-agnostic labels for how much capability a task warrants. Each platform 
 | **Claude Code** | `CLAUDE.md` → `[KIT_DIR]/AGENT.md` | `[KIT_DIR]/platforms/claude-code/SUBAGENT_PATTERNS.md` |
 | **GitHub Copilot** | `[KIT_DIR]/AGENT.md` | `[KIT_DIR]/platforms/github-copilot/` *(not yet defined)* |
 | **Cursor** | `[KIT_DIR]/AGENT.md` | `[KIT_DIR]/platforms/cursor/` *(not yet defined)* |
-| **Gemini** | `GEMINI.md` → `[KIT_DIR]/AGENT.md` | `[KIT_DIR]/platforms/gemini/` *(not yet defined)* |
+| **Gemini** | `GEMINI.md` → `[KIT_DIR]/AGENT.md` | `[KIT_DIR]/platforms/gemini/SUBAGENT_PATTERNS.md` |
 | **ChatGPT / GPT-4** | `[KIT_DIR]/AGENT.md` | `[KIT_DIR]/platforms/chatgpt/` *(not yet defined)* |
 
 Universal: all platforms read `[KIT_DIR]/AGENT.md` first. Scripts in `[KIT_DIR]/scripts/` are bash-compatible and platform-agnostic.
